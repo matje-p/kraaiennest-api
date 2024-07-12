@@ -13,14 +13,21 @@ dotenv.config();
 const app = express();
 
 // Middleware
-app.use(cors());
+
+// Update the CORS options to allow your frontend's domain
+const corsOptions = {
+  origin: 'https://kraaiennest.vercel.app', // Allow requests from this origin
+  optionsSuccessStatus: 200, // For legacy browser support
+};
+
+app.use(cors(corsOptions));
 app.use(bodyParser.json());
 
 // Rate limiting middleware
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // limit each IP to 100 requests per windowMs
-  message: 'Too many requests from this IP, please try again after 15 minutes'
+  message: 'Too many requests from this IP, please try again after 15 minutes',
 });
 
 // Apply rate limiting to all requests
