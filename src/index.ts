@@ -12,6 +12,8 @@ dotenv.config();
 // Create an Express application
 const app = express();
 
+// Trigger build
+
 // Middleware
 
 // Update the CORS options to allow your frontend's domain
