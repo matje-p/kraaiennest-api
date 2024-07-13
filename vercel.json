@@ -2,7 +2,7 @@
     "version": 2,
     "builds": [
       {
-        "src": "index.ts",
+        "src": "dist/index.js",
         "use": "@vercel/node",
         "config": {
           "includeFiles": ["./routes/**"]
@@ -12,10 +12,7 @@
     "routes": [
       {
         "src": "/(.*)",
-        "dest": "index.ts"
+        "dest": "dist/index.js"
       }
-    ],
-    "env": {
-      "MONGO_URI": "@mongo_uri"
-    }
+    ]
   }
