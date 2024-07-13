@@ -16,9 +16,10 @@ const app = express();
 
 // Update the CORS options to allow your frontend's domain
 const corsOptions = {
-  origin: 'https://kraaiennest.vercel.app', // Allow requests from this origin
+  origin: ['https://kraaiennest.vercel.app', 'http://localhost:3000'], // Allow requests from these origins
   optionsSuccessStatus: 200, // For legacy browser support
 };
+
 
 // Apply CORS middleware first
 app.use(cors(corsOptions));
