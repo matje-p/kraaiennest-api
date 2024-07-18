@@ -16,7 +16,7 @@ const app = express();
 
 // Update the CORS options to allow your frontend's domain
 const corsOptions = {
-  origin: ['https://kraaiennest.vercel.app', 'http://localhost:3000'], // Allow requests from these origins
+  origin: process.env.CORS_ORIGIN, // Allow requests from these origins
   optionsSuccessStatus: 200, // For legacy browser support
 };
 
@@ -28,7 +28,7 @@ app.use(bodyParser.json());
 // Rate limiting middleware
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
+  max: 1000, // limit each IP to 100 requests per windowMs
   message: 'Too many requests from this IP, please try again after 15 minutes',
 });
 
@@ -51,7 +51,7 @@ app.use('/api/items', items);
 // Routes placeholder
 app.get('/', (req, res) => res.send('API Running'));
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT;
 app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
 
 // Type guard for error handling

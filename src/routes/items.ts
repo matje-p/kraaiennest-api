@@ -42,14 +42,22 @@ router.post('/', async (req, res) => {
 });
 
 // Edit item
-router.put('/:id', async (req, res) => {
+router.patch('/:id/item', async (req, res) => {
   const { id } = req.params;
+  const { item } = req.body;
   console.log(`Edit request for item id: ${id}`);
+
   try {
-    const updatedItem = await Item.findOneAndUpdate({ id }, req.body, { new: true });
+    const updatedItem = await Item.findOneAndUpdate(
+      { id },
+      { item },
+      { new: true }
+    );
+    
     if (!updatedItem) {
       return res.status(404).json({ message: 'Item not found' });
     }
+
     res.json(updatedItem);
   } catch (err: unknown) {
     if (isError(err)) {
@@ -107,24 +115,22 @@ router.patch('/:id/done', async (req, res) => {
 });
 
 
+// // Undo boodschappen
+// router.post('/undo', async (req, res) => {
+//   const { prevBoodschappen } = req.body;
 
+//   try {
+//     await Item.deleteMany({});
+//     const addedItems = await Item.insertMany(prevBoodschappen);
 
-// Undo boodschappen
-router.post('/undo', async (req, res) => {
-  const { prevBoodschappen } = req.body;
-
-  try {
-    await Item.deleteMany({});
-    const addedItems = await Item.insertMany(prevBoodschappen);
-
-    res.json({ message: 'Current state deleted' });
-  } catch (err: unknown) {
-    if (isError(err)) {
-      res.status(500).json({ error: err.message });
-    } else {
-      res.status(500).json({ error: 'Unknown error' });
-    }
-  }
-});
+//     res.json({ message: 'Current state deleted' });
+//   } catch (err: unknown) {
+//     if (isError(err)) {
+//       res.status(500).json({ error: err.message });
+//     } else {
+//       res.status(500).json({ error: 'Unknown error' });
+//     }
+//   }
+// });
 
 export default router;
