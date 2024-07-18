@@ -1,6 +1,6 @@
 import express from 'express';
 import mongoose from 'mongoose';
-import cors from 'cors';
+import cors, { CorsOptions } from 'cors';
 import bodyParser from 'body-parser';
 import items from './routes/items';
 import dotenv from 'dotenv';
@@ -15,14 +15,22 @@ const app = express();
 // Middleware
 
 // Update the CORS options to allow your frontend's domain
-const corsOptions = {
-  origin: process.env.CORS_ORIGIN, // Allow requests from these origins
+const allowedOrigins = process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : [];
+
+const corsOptions: CorsOptions = {
+  origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+    if (allowedOrigins.includes(origin || '') || !origin) {
+      // Allow requests with no origin (like mobile apps or curl requests)
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   optionsSuccessStatus: 200, // For legacy browser support
 };
-
-
-// Apply CORS middleware first
+// Use CORS middleware with the options
 app.use(cors(corsOptions));
+
 app.use(bodyParser.json());
 
 // Rate limiting middleware
