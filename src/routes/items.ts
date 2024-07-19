@@ -43,10 +43,10 @@ router.post('/', async (req, res) => {
 
 // Edit item
 router.patch('/:id/item', async (req, res) => {
+  console.log(`Edit request for item id: ${id}`);
   const { id } = req.params;
   const { item } = req.body;
-  console.log(`Edit request for item id: ${id}`);
-
+  
   try {
     const updatedItem = await Item.findOneAndUpdate(
       { id },
