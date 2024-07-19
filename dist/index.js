@@ -16,17 +16,26 @@ dotenv_1.default.config();
 const app = (0, express_1.default)();
 // Middleware
 // Update the CORS options to allow your frontend's domain
+const allowedOrigins = process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : [];
 const corsOptions = {
-    origin: 'https://kraaiennest.vercel.app', // Allow requests from this origin
+    origin: (origin, callback) => {
+        if (allowedOrigins.includes(origin || '') || !origin) {
+            // Allow requests with no origin (like mobile apps or curl requests)
+            callback(null, true);
+        }
+        else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
     optionsSuccessStatus: 200, // For legacy browser support
 };
-// Apply CORS middleware first
+// Use CORS middleware with the options
 app.use((0, cors_1.default)(corsOptions));
 app.use(body_parser_1.default.json());
 // Rate limiting middleware
 const limiter = (0, express_rate_limit_1.default)({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // limit each IP to 100 requests per windowMs
+    max: 1000, // limit each IP to 100 requests per windowMs
     message: 'Too many requests from this IP, please try again after 15 minutes',
 });
 // Apply rate limiting to all requests
@@ -43,7 +52,7 @@ mongoose_1.default.connect(mongoURI, {})
 app.use('/api/items', items_1.default);
 // Routes placeholder
 app.get('/', (req, res) => res.send('API Running'));
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT;
 app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
 // Type guard for error handling
 const isError = (err) => {

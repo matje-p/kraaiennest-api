@@ -52,11 +52,12 @@ router.post('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
 }));
 // Edit item
-router.put('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.patch('/:id/item', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
+    const { item } = req.body;
     console.log(`Edit request for item id: ${id}`);
     try {
-        const updatedItem = yield Item_1.default.findOneAndUpdate({ id }, req.body, { new: true });
+        const updatedItem = yield Item_1.default.findOneAndUpdate({ id }, { item }, { new: true });
         if (!updatedItem) {
             return res.status(404).json({ message: 'Item not found' });
         }
@@ -114,21 +115,19 @@ router.patch('/:id/done', (req, res) => __awaiter(void 0, void 0, void 0, functi
         }
     }
 }));
-// Undo boodschappen
-router.post('/undo', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { prevBoodschappen } = req.body;
-    try {
-        yield Item_1.default.deleteMany({});
-        const addedItems = yield Item_1.default.insertMany(prevBoodschappen);
-        res.json({ message: 'Current state deleted' });
-    }
-    catch (err) {
-        if (isError(err)) {
-            res.status(500).json({ error: err.message });
-        }
-        else {
-            res.status(500).json({ error: 'Unknown error' });
-        }
-    }
-}));
+// // Undo boodschappen
+// router.post('/undo', async (req, res) => {
+//   const { prevBoodschappen } = req.body;
+//   try {
+//     await Item.deleteMany({});
+//     const addedItems = await Item.insertMany(prevBoodschappen);
+//     res.json({ message: 'Current state deleted' });
+//   } catch (err: unknown) {
+//     if (isError(err)) {
+//       res.status(500).json({ error: err.message });
+//     } else {
+//       res.status(500).json({ error: 'Unknown error' });
+//     }
+//   }
+// });
 exports.default = router;
