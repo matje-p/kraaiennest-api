@@ -115,19 +115,25 @@ router.patch('/:id/done', (req, res) => __awaiter(void 0, void 0, void 0, functi
         }
     }
 }));
-// // Undo boodschappen
-// router.post('/undo', async (req, res) => {
-//   const { prevBoodschappen } = req.body;
-//   try {
-//     await Item.deleteMany({});
-//     const addedItems = await Item.insertMany(prevBoodschappen);
-//     res.json({ message: 'Current state deleted' });
-//   } catch (err: unknown) {
-//     if (isError(err)) {
-//       res.status(500).json({ error: err.message });
-//     } else {
-//       res.status(500).json({ error: 'Unknown error' });
-//     }
-//   }
-// });
+// Upsert item
+router.put('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log(`Put request for item id: ${req.params.id}`); // Log the request id
+    try {
+        const item = yield Item_1.default.findOneAndUpdate({ id: req.params.id }, // Use the custom id field
+        req.body, // Update with request body
+        { new: true, upsert: true } // Return the updated document, create if not found
+        );
+        res.json(item);
+    }
+    catch (err) {
+        if (isError(err)) {
+            console.error('Error upserting item:', err.message);
+            res.status(500).json({ error: err.message });
+        }
+        else {
+            console.error('Unknown error upserting item');
+            res.status(500).json({ error: 'Unknown error' });
+        }
+    }
+}));
 exports.default = router;

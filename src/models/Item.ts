@@ -1,4 +1,4 @@
-import { Schema, model } from 'mongoose';
+import { Date, Schema, model } from 'mongoose';
 
 interface IItem {
   item: string;

@@ -8,8 +8,6 @@ const isError = (err: unknown): err is Error => {
     return (err as Error).message !== undefined;
   };
 
-
-
 // Fetch all items
 router.get('/', async (req, res) => {
   try {
@@ -48,7 +46,6 @@ router.patch('/:id/item', async (req, res) => {
   const { item } = req.body;
   console.log(`Edit request for item id: ${id}`);
 
-  
   try {
     const updatedItem = await Item.findOneAndUpdate(
       { id },
@@ -94,7 +91,6 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
-
 // Endpoint to mark item as done
 router.patch('/:id/done', async (req, res) => {
   try {
@@ -116,23 +112,26 @@ router.patch('/:id/done', async (req, res) => {
   }
 });
 
+// Upsert item
+router.put('/:id', async (req, res) => {
+  console.log(`Put request for item id: ${req.params.id}`); // Log the request id
+  try {
+    const item = await Item.findOneAndUpdate(
+      { id: req.params.id }, // Use the custom id field
+      req.body, // Update with request body
+      { new: true, upsert: true } // Return the updated document, create if not found
+    );
+    res.json(item);
+  } catch (err: unknown) {
+    if (isError(err)) {
+      console.error('Error upserting item:', err.message);
+      res.status(500).json({ error: err.message });
+    } else {
+      console.error('Unknown error upserting item');
+      res.status(500).json({ error: 'Unknown error' });
+    }
+  }
+});
 
-// // Undo boodschappen
-// router.post('/undo', async (req, res) => {
-//   const { prevBoodschappen } = req.body;
-
-//   try {
-//     await Item.deleteMany({});
-//     const addedItems = await Item.insertMany(prevBoodschappen);
-
-//     res.json({ message: 'Current state deleted' });
-//   } catch (err: unknown) {
-//     if (isError(err)) {
-//       res.status(500).json({ error: err.message });
-//     } else {
-//       res.status(500).json({ error: 'Unknown error' });
-//     }
-//   }
-// });
 
 export default router;
