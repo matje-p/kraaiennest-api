@@ -12,7 +12,7 @@ interface BoodschapProps {
 }
 
 const BoodschapSchema = new Schema<BoodschapProps>({
-  item: { type: String, required: true },
+  item: { type: String, required: false },
   userAdded: { type: String, required: true },
   dateAdded: { type: Date, required: true },
   userDone: { type: String, required: false },
