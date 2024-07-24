@@ -7,7 +7,7 @@ const express_1 = __importDefault(require("express"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const cors_1 = __importDefault(require("cors"));
 const body_parser_1 = __importDefault(require("body-parser"));
-const items_1 = __importDefault(require("./routes/items"));
+const boodschappen_1 = __importDefault(require("./routes/boodschappen"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const express_rate_limit_1 = __importDefault(require("express-rate-limit"));
 // Load environment variables from .env file
@@ -48,12 +48,12 @@ if (!mongoURI) {
 mongoose_1.default.connect(mongoURI, {})
     .then(() => console.log('MongoDB connected'))
     .catch(err => console.error(err));
-// Use the items router for /api/items
-app.use('/api/items', items_1.default);
+// // Use the items router for /api/items
+app.use('/api/boodschappen', boodschappen_1.default);
 // Routes placeholder
 app.get('/', (req, res) => res.send('API Running'));
 const PORT = process.env.PORT;
-app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
+app.listen(PORT, () => console.log(`Server started on port ${PORT}, connection string: ${mongoURI}`));
 // Type guard for error handling
 const isError = (err) => {
     return err.message !== undefined;

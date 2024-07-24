@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import Item from '../models/Item';
+import Boodschap from '../models/Boodschap';
 
 const router = Router();
 
@@ -8,11 +8,11 @@ const isError = (err: unknown): err is Error => {
     return (err as Error).message !== undefined;
   };
 
-// Fetch all items
+// Fetch all boodschappen
 router.get('/', async (req, res) => {
   try {
-    const items = await Item.find();
-    res.json(items);
+    const boodschappen = await Boodschap.find();
+    res.json(boodschappen);
   } catch (err: unknown) {
     if (isError(err)) {
       res.status(500).json({ error: (err as Error).message });
@@ -23,13 +23,13 @@ router.get('/', async (req, res) => {
 });
 
 
-// Add new item
+// Add new Boodschap
 router.post('/', async (req, res) => {
     console.log('Incoming request body:', req.body); // Log request body
   try {
-    const newItem = new Item(req.body);
-    const savedItem = await newItem.save();
-    res.json(savedItem);
+    const newBoodschap = new Boodschap(req.body);
+    const savedBoodschap = await newBoodschap.save();
+    res.json(savedBoodschap);
   } catch (err: unknown) {
     if (isError(err)) {
       res.status(500).json({ error: (err as Error).message });
@@ -39,70 +39,70 @@ router.post('/', async (req, res) => {
   }
 });
 
-// Edit item
-router.patch('/:id/item', async (req, res) => {
+// Edit boodschap
+router.patch('/:id', async (req, res) => {
   
   const { id } = req.params;
-  const { item } = req.body;
-  console.log(`Edit request for item id: ${id}`);
+  const { item, userLastChange } = req.body;  // Destructure userLastChange from req.body
+  console.log(`Edit request for boodschap id: ${id}`);
 
   try {
-    const updatedItem = await Item.findOneAndUpdate(
+    const updatedBoodschap = await Boodschap.findOneAndUpdate(
       { id },
-      { item },
+      { item, userLastChange },  // Update both item and userLastChange
       { new: true }
     );
     
-    if (!updatedItem) {
-      return res.status(404).json({ message: 'Item not found' });
+    if (!updatedBoodschap) {
+      return res.status(404).json({ message: 'Boodschap not found' });
     }
 
-    res.json(updatedItem);
+    res.json(updatedBoodschap);
   } catch (err: unknown) {
     if (isError(err)) {
-      console.error('Error editing item:', err.message);
+      console.error('Error editing boodschap:', err.message);
       res.status(500).json({ error: err.message });
     } else {
-      console.error('Unknown error editing item');
+      console.error('Unknown error editing boodschap');
       res.status(500).json({ error: 'Unknown error' });
     }
   }
 });
 
 
-// Delete item
+// Delete boodschap
 router.delete('/:id', async (req, res) => {
-  console.log(`Delete request for item id: ${req.params.id}`); // Log the request id
+  console.log(`Delete request for boodschap id: ${req.params.id}`); // Log the request id
   try {
-    const deletedItem = await Item.findOneAndDelete({ id: req.params.id }); // Use findOneAndDelete with custom id
-    if (!deletedItem) {
-      console.error(`Item with id ${req.params.id} not found`);
-      return res.status(404).json({ message: 'Item not found' });
+    const deletedBoodschap = await Boodschap.findOneAndDelete({ id: req.params.id }); // Use findOneAndDelete with custom id
+    if (!deletedBoodschap) {
+      console.error(`Boodschap with id ${req.params.id} not found`);
+      return res.status(404).json({ message: 'Boodschap not found' });
     }
-    res.json({ message: 'Item deleted successfully' });
+    res.json({ message: 'Boodschap deleted successfully' });
   } catch (err: unknown) {
     if (isError(err)) {
-      console.error('Error deleting item:', err.message);
+      console.error('Error deleting boodschap:', err.message);
       res.status(500).json({ error: err.message });
     } else {
-      console.error('Unknown error deleting item');
+      console.error('Unknown error deleting boodschap');
       res.status(500).json({ error: 'Unknown error' });
     }
   }
 });
 
-// Endpoint to mark item as done
+// Endpoint to mark boodschap as done
 router.patch('/:id/done', async (req, res) => {
   try {
-    const updatedItem = await Item.findOneAndUpdate(
+    const updatedBoodschap = await Boodschap.findOneAndUpdate(
       { id: req.params.id },  // Use the custom id field
       { done: req.body.done, dateDone: new Date(), userDone: req.body.userDone },
       { new: true }
     );
-    if (!updatedItem) {
-      return res.status(404).json({ message: 'Item not found' });
+    if (!updatedBoodschap) {
+      return res.status(404).json({ message: 'Boodschap not found' });
     }
-    res.json(updatedItem);
+    res.json(updatedBoodschap);
   } catch (err: unknown) {
     if (isError(err)) {
       res.status(500).json({ error: err.message });
@@ -112,22 +112,22 @@ router.patch('/:id/done', async (req, res) => {
   }
 });
 
-// Upsert item
+// Upsert boodschap
 router.put('/:id', async (req, res) => {
-  console.log(`Put request for item id: ${req.params.id}`); // Log the request id
+  console.log(`Put request for boodschap id: ${req.params.id}`); // Log the request id
   try {
-    const item = await Item.findOneAndUpdate(
+    const boodschap = await Boodschap.findOneAndUpdate(
       { id: req.params.id }, // Use the custom id field
       req.body, // Update with request body
       { new: true, upsert: true } // Return the updated document, create if not found
     );
-    res.json(item);
+    res.json(boodschap);
   } catch (err: unknown) {
     if (isError(err)) {
-      console.error('Error upserting item:', err.message);
+      console.error('Error upserting boodschap:', err.message);
       res.status(500).json({ error: err.message });
     } else {
-      console.error('Unknown error upserting item');
+      console.error('Unknown error upserting boodschap');
       res.status(500).json({ error: 'Unknown error' });
     }
   }

@@ -2,7 +2,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import cors, { CorsOptions } from 'cors';
 import bodyParser from 'body-parser';
-import items from './routes/items';
+import boodschappen from './routes/boodschappen';
 import dotenv from 'dotenv';
 import rateLimit from 'express-rate-limit';
 
@@ -11,6 +11,8 @@ dotenv.config();
 
 // Create an Express application
 const app = express();
+
+console.log(`Environment: ${process.env.NODE_ENV}`);
 
 // Middleware
 
@@ -53,14 +55,14 @@ mongoose.connect(mongoURI, {})
   .then(() => console.log('MongoDB connected'))
   .catch(err => console.error(err));
 
-// Use the items router for /api/items
-app.use('/api/items', items);
+// // Use the items router for /api/items
+app.use('/api/boodschappen', boodschappen);
 
 // Routes placeholder
 app.get('/', (req, res) => res.send('API Running'));
 
 const PORT = process.env.PORT;
-app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
+app.listen(PORT, () => console.log(`Server started on port ${PORT}, connection string: ${mongoURI}`));
 
 // Type guard for error handling
 const isError = (err: unknown): err is Error => {
