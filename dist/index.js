@@ -14,6 +14,7 @@ const express_rate_limit_1 = __importDefault(require("express-rate-limit"));
 dotenv_1.default.config();
 // Create an Express application
 const app = (0, express_1.default)();
+console.log(`Environment: ${process.env.NODE_ENV}`);
 // Middleware
 // Update the CORS options to allow your frontend's domain
 const allowedOrigins = process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : [];
