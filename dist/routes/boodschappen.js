@@ -20,13 +20,10 @@ const isError = (err) => {
     return err.message !== undefined;
 };
 // Fetch all boodschappen or filter by household
-router.get('/:household', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { household } = req.params;
+router.get('/:householdName', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { householdName } = req.params;
     try {
-        // if (!household) {
-        //   return res.status(400).json({ error: 'Household parameter is required' });
-        // }
-        const boodschappen = yield Boodschap_1.default.find({ household });
+        const boodschappen = yield Boodschap_1.default.find({ householdName });
         res.json(boodschappen);
     }
     catch (err) {
