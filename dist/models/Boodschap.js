@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = require("mongoose");
 const BoodschapSchema = new mongoose_1.Schema({
+    household: { type: String, required: true },
     item: { type: String, required: false },
     userAdded: { type: String, required: true },
     dateAdded: { type: Date, required: true },

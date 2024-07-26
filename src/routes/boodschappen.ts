@@ -8,14 +8,17 @@ const isError = (err: unknown): err is Error => {
     return (err as Error).message !== undefined;
   };
 
-// Fetch all boodschappen
-router.get('/', async (req, res) => {
+
+// Fetch all boodschappen or filter by household
+router.get('/:householdName', async (req, res) => {
+  const { householdName } = req.params;
+
   try {
-    const boodschappen = await Boodschap.find();
+    const boodschappen = await Boodschap.find({ householdName });
     res.json(boodschappen);
-  } catch (err: unknown) {
-    if (isError(err)) {
-      res.status(500).json({ error: (err as Error).message });
+  } catch (err) {
+    if (err instanceof Error) {
+      res.status(500).json({ error: err.message });
     } else {
       res.status(500).json({ error: 'Unknown error' });
     }

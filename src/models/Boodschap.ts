@@ -1,7 +1,8 @@
 import { Date, Schema, model } from 'mongoose';
 
 interface BoodschapProps {
-  household: string;
+  householdName: string;
+  householdId: string;
   item: string;
   userAdded: string;
   dateAdded: Date;
@@ -13,7 +14,8 @@ interface BoodschapProps {
 }
 
 const BoodschapSchema = new Schema<BoodschapProps>({
-  household: { type: String, required: true },
+  householdName: { type: String, required: true },
+  householdId: { type: String, required: false },
   item: { type: String, required: false },
   userAdded: { type: String, required: true },
   dateAdded: { type: Date, required: true },

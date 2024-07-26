@@ -19,14 +19,18 @@ const router = (0, express_1.Router)();
 const isError = (err) => {
     return err.message !== undefined;
 };
-// Fetch all boodschappen
-router.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+// Fetch all boodschappen or filter by household
+router.get('/:household', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { household } = req.params;
     try {
-        const boodschappen = yield Boodschap_1.default.find();
+        // if (!household) {
+        //   return res.status(400).json({ error: 'Household parameter is required' });
+        // }
+        const boodschappen = yield Boodschap_1.default.find({ household });
         res.json(boodschappen);
     }
     catch (err) {
-        if (isError(err)) {
+        if (err instanceof Error) {
             res.status(500).json({ error: err.message });
         }
         else {
