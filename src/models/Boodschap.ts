@@ -1,16 +1,16 @@
 import { Date, Schema, model } from 'mongoose';
 
 interface BoodschapProps {
-  householdName: string;
-  householdId: string;
-  item: string;
-  userAdded: string;
-  dateAdded: Date;
-  userDone: string;
-  dateDone: Date;
-  done: boolean;
-  userLastChange: string;
-  id: string;
+    householdName: string;
+    householdId: string;
+    item: string;
+    userAdded: string;
+    dateAdded: Date;
+    userDone: string;
+    dateDone: Date;
+    done: boolean;
+    userLastChange: string;
+    id: string;
 }
 
 const BoodschapSchema = new Schema<BoodschapProps>({

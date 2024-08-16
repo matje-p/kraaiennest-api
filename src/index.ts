@@ -1,10 +1,12 @@
 import express from 'express';
-import mongoose from 'mongoose';
+import { Pool } from 'pg';
 import cors, { CorsOptions } from 'cors';
 import bodyParser from 'body-parser';
-import boodschappen from './routes/boodschappen';
 import dotenv from 'dotenv';
 import rateLimit from 'express-rate-limit';
+import boodschapRoutes from './routes/boodschapRoutes';
+import userRoutes from './routes/userRoutes';
+import householdRoutes from './routes/householdRoutes';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -30,6 +32,7 @@ const corsOptions: CorsOptions = {
   },
   optionsSuccessStatus: 200, // For legacy browser support
 };
+
 // Use CORS middleware with the options
 app.use(cors(corsOptions));
 
@@ -38,33 +41,68 @@ app.use(bodyParser.json());
 // Rate limiting middleware
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 1000, // limit each IP to 100 requests per windowMs
+  max: 1000, // limit each IP to 1000 requests per windowMs
   message: 'Too many requests from this IP, please try again after 15 minutes',
 });
 
 // Apply rate limiting to all requests
 app.use(limiter);
 
-// MongoDB connection
-const mongoURI = process.env.MONGO_URI;
-if (!mongoURI) {
-  throw new Error("MONGO_URI is not defined in the environment variables");
+// PostgreSQL connection
+const pool = new Pool({
+  host: process.env.DB_HOST,
+  port: parseInt(process.env.DB_PORT || '5432'),
+  database: process.env.DB_NAME,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  ssl: {
+    rejectUnauthorized: false
+  }
+});
+
+pool.connect()
+  .then(() => console.log('PostgreSQL connected'))
+  .catch(err => console.error('Error connecting to PostgreSQL', err));
+
+// Make pool available in request object
+declare global {
+  namespace Express {
+    interface Request {
+      db: Pool;
+    }
+  }
 }
 
-mongoose.connect(mongoURI, {})
-  .then(() => console.log('MongoDB connected'))
-  .catch(err => console.error(err));
+app.use((req, res, next) => {
+  req.db = pool;
+  next();
+});
 
-// // Use the items router for /api/items
-app.use('/api/boodschappen', boodschappen);
+// Mount routes
 
-// Routes placeholder
-app.get('/', (req, res) => res.send('API Running'));
+app.use('/boodschappen', boodschapRoutes);
+console.log('boodschapRoutes mounted');
+app.use('/households', householdRoutes);
+console.log('householdRoutes mounted');
+app.use('/users', userRoutes);
+console.log('userRoutes mounted');
 
-const PORT = process.env.PORT;
-app.listen(PORT, () => console.log(`Server started on port ${PORT}, connection string: ${mongoURI}`));
+// Root route
+app.get('/', (req, res) => {
+  console.log('Root route hit');
+  res.send('API Running');
+});
+
+// Catch-all route for debugging
+app.use((req, res) => {
+  console.log(`404 - Not Found: ${req.method} ${req.originalUrl}`);
+  res.status(404).send('404 - Not Found');
+});
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
 
 // Type guard for error handling
-const isError = (err: unknown): err is Error => {
+export const isError = (err: unknown): err is Error => {
   return (err as Error).message !== undefined;
 };
