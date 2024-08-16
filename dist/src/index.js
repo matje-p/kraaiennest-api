@@ -13,8 +13,6 @@ const express_rate_limit_1 = __importDefault(require("express-rate-limit"));
 const boodschapRoutes_1 = __importDefault(require("./routes/boodschapRoutes"));
 const userRoutes_1 = __importDefault(require("./routes/userRoutes"));
 const householdRoutes_1 = __importDefault(require("./routes/householdRoutes"));
-// import householdRoutes from './routes/householdRoutes';
-// import userRoutes from './routes/userRoutes';
 // Load environment variables from .env file
 dotenv_1.default.config();
 // Create an Express application
