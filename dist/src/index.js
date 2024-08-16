@@ -86,3 +86,4 @@ const isError = (err) => {
     return err.message !== undefined;
 };
 exports.isError = isError;
+exports.default = app;
