@@ -16,15 +16,12 @@ const app = express();
 
 console.log(`Environment: ${process.env.NODE_ENV}`);
 
-// Middleware
-
-// Update the CORS options to allow your frontend's domain
+// CORS Middleware (move it up before any other middleware)
 const allowedOrigins = process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : [];
 
 const corsOptions: CorsOptions = {
   origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
     if (allowedOrigins.includes(origin || '') || !origin) {
-      // Allow requests with no origin (like mobile apps or curl requests)
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
@@ -33,8 +30,16 @@ const corsOptions: CorsOptions = {
   optionsSuccessStatus: 200, // For legacy browser support
 };
 
-// Use CORS middleware with the options
 app.use(cors(corsOptions));
+
+// API Key check middleware (run after CORS middleware)
+app.use((req, res, next) => {
+  const apiKey = req.headers['x-api-key'];
+  if (apiKey !== process.env.API_KEY) {
+    return res.status(403).json({ message: 'Forbidden: Invalid API Key' });
+  }
+  next();
+});
 
 app.use(bodyParser.json());
 
@@ -45,7 +50,6 @@ const limiter = rateLimit({
   message: 'Too many requests from this IP, please try again after 15 minutes',
 });
 
-// Apply rate limiting to all requests
 app.use(limiter);
 
 // PostgreSQL connection
@@ -56,15 +60,14 @@ const pool = new Pool({
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   ssl: {
-    rejectUnauthorized: false
-  }
+    rejectUnauthorized: false,
+  },
 });
 
 pool.connect()
   .then(() => console.log('PostgreSQL connected'))
   .catch(err => console.error('Error connecting to PostgreSQL', err));
 
-// Make pool available in request object
 declare global {
   namespace Express {
     interface Request {
@@ -79,7 +82,6 @@ app.use((req, res, next) => {
 });
 
 // Mount routes
-
 app.use('/boodschappen', boodschapRoutes);
 console.log('boodschapRoutes mounted');
 app.use('/households', householdRoutes);
