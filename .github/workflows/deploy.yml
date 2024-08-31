@@ -3,25 +3,23 @@ name: Deploy to EC2
 on:
   push:
     branches:
-      - main # Adjust to your specific branch
+      - main # Adjust to your specific branch if needed
+  workflow_dispatch: # Allows manual triggering of the workflow
 
 jobs:
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
-    env:
-      AWS_INSTANCE_SG_ID: ${{ secrets.AWS_INSTANCE_SG_ID }} # Use the secret for the security group ID
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
+      - name: Configure AWS Credentials using OIDC
+        uses: aws-actions/configure-aws-credentials@v2
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          role-to-assume: arn:aws:iam::<AWS_ACCOUNT_ID>:role/<ROLE_NAME> # Replace with your AWS Account ID and Role Name
+          aws-region: eu-north-1
 
       - name: Get runner IP address
         id: ip
@@ -29,22 +27,32 @@ jobs:
 
       - name: Whitelist runner IP address
         run: |
-          aws ec2 authorize-security-group-ingress \
-            --group-id $AWS_INSTANCE_SG_ID \
-            --protocol tcp \
-            --port 22 \
-            --cidr ${{ steps.ip.outputs.ipv4 }}/32
+          PORTS=(22) # Add other ports if necessary, e.g., 80 for HTTP, 443 for HTTPS
+          for PORT in "${PORTS[@]}"; do
+            aws ec2 authorize-security-group-ingress \
+              --group-id ${{ secrets.AWS_INSTANCE_SG_ID }} \
+              --protocol tcp \
+              --port $PORT \
+              --cidr ${{ steps.ip.outputs.ipv4 }}/32
+          done
 
-      - name: SSH into your EC2 and perform tasks
-        run: |
-          ssh -o StrictHostKeyChecking=no ec2-user@<EC2_PUBLIC_IP> 'your commands here'
+      - name: SSH into EC2 and perform tasks
         env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }} # Ensure your SSH private key is stored securely
+          EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+          EC2_USER: ${{ secrets.EC2_USER }}
+        run: |
+          echo "${EC2_SSH_KEY}" > key.pem
+          chmod 400 key.pem
+          ssh -o StrictHostKeyChecking=no -i key.pem $EC2_USER@$EC2_HOST 'your deployment commands here' # Replace with your actual deployment commands
 
       - name: Revoke runner IP address
         run: |
-          aws ec2 revoke-security-group-ingress \
-            --group-id $AWS_INSTANCE_SG_ID \
-            --protocol tcp \
-            --port 22 \
-            --cidr ${{ steps.ip.outputs.ipv4 }}/32
+          PORTS=(22) # Match the ports used in the whitelist step
+          for PORT in "${PORTS[@]}"; do
+            aws ec2 revoke-security-group-ingress \
+              --group-id ${{ secrets.AWS_INSTANCE_SG_ID }} \
+              --protocol tcp \
+              --port $PORT \
+              --cidr ${{ steps.ip.outputs.ipv4 }}/32
+          done
