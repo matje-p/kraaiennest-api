@@ -21,6 +21,7 @@ jobs:
         with:
           role-to-assume: arn:aws:iam::539247482630:role/service-role/UpdateSecurityGroupForGitHubActions-role-skd8ql4d # Replace with your AWS Account ID and Role Name
           aws-region: eu-north-1
+          audience: sts.amazonaws.com
 
       - name: Get runner IP address
         id: ip
