@@ -18,7 +18,7 @@ jobs:
       - name: Configure AWS Credentials using OIDC
         uses: aws-actions/configure-aws-credentials@v2
         with:
-          role-to-assume: arn:aws:iam::<AWS_ACCOUNT_ID>:role/<ROLE_NAME> # Replace with your AWS Account ID and Role Name
+          role-to-assume: arn:aws:iam::539247482630:role/service-role/UpdateSecurityGroupForGitHubActions-role-skd8ql4d # Replace with your AWS Account ID and Role Name
           aws-region: eu-north-1
 
       - name: Get runner IP address
