@@ -11,15 +11,12 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4 # Updated to the latest version
 
-      - name: Set up SSH agent and add private key
-        uses: webfactory/ssh-agent@v0.5.4
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.7.0 # Updated to a newer version
         with:
           ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
-
-      - name: Check SSH key
-        run: ssh-add -l # This will list the added SSH keys for debugging
 
       - name: Copy files to EC2
         run: |
