@@ -22,9 +22,9 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_HOST }} "sudo mkdir -p /var/www/kraaiennest-api && sudo chown -R ec2-user:ec2-user /var/www/kraaiennest-api"
 
-      - name: Copy files to EC2
+      - name: Copy files to EC2 using rsync
         run: |
-          scp -o StrictHostKeyChecking=no -r ./* ec2-user@${{ secrets.EC2_HOST }}:/var/www/kraaiennest-api/
+          rsync -avz --delete --exclude='node_modules' --exclude='.git' ./ ec2-user@${{ secrets.EC2_HOST }}:/var/www/kraaiennest-api/
 
       - name: Run deployment script on EC2
         run: |
