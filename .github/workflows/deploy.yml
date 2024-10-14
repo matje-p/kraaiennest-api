@@ -11,21 +11,21 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4 # Updated to the latest version
+        uses: actions/checkout@v4 # Use the latest version of the checkout action
 
-      - name: Set up SSH
-        uses: webfactory/ssh-agent@v0.7.0 # Updated to a newer version
+      - name: Set up SSH agent
+        uses: webfactory/ssh-agent@v0.7.0 # Updated to the latest version
         with:
-          ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
+          ssh-private-key: ${{ secrets.EC2_SSH_KEY }} # Use your GitHub secret for the EC2 SSH key
 
       - name: Copy files to EC2
         run: |
-          ssh -o StrictHostKeyChecking=no ec2-user@<EC2-IP> "mkdir -p /var/www/kraaiennest-api"
-          scp -o StrictHostKeyChecking=no -r ./* ec2-user@<EC2-IP>:/var/www/kraaiennest-api/
+          ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_HOST }} "mkdir -p /var/www/kraaiennest-api"
+          scp -o StrictHostKeyChecking=no -r ./* ec2-user@${{ secrets.EC2_HOST }}:/var/www/kraaiennest-api/
 
       - name: Run deployment script on EC2
         run: |
-          ssh -o StrictHostKeyChecking=no ec2-user@<EC2-IP> "
+          ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_HOST }} "
           cd /var/www/kraaiennest-api &&
           sudo docker-compose down &&
           sudo docker-compose up --build -d"
