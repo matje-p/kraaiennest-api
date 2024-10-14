@@ -26,9 +26,18 @@ jobs:
         run: |
           rsync -avz --delete --exclude='node_modules' --exclude='.git' ./ ec2-user@${{ secrets.EC2_HOST }}:/var/www/kraaiennest-api/
 
-      - name: Run deployment script on EC2
+      - name: Install dependencies on EC2
         run: |
           ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_HOST }} "
           cd /var/www/kraaiennest-api &&
-          sudo docker-compose down &&
-          sudo docker-compose up --build -d"
+          npm install
+          "
+
+      - name: Restart application with PM2
+        run: |
+          ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_HOST }} "
+          cd /var/www/kraaiennest-api &&
+          pm2 stop all || true &&  # Stops all running PM2 processes if any
+          pm2 start npm --name kraaiennest-api -- run start &&  # Starts the app using npm run start
+          pm2 save  # Saves the process list for PM2 to restart on reboot
+          "
