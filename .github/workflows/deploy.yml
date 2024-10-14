@@ -11,12 +11,12 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4 # Use the latest version of the checkout action
+        uses: actions/checkout@v4
 
       - name: Set up SSH agent
-        uses: webfactory/ssh-agent@v0.7.0 # Updated to the latest version
+        uses: webfactory/ssh-agent@v0.7.0
         with:
-          ssh-private-key: ${{ secrets.EC2_SSH_KEY }} # Use your GitHub secret for the EC2 SSH key
+          ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
 
       - name: Create directory on EC2 with correct ownership
         run: |
@@ -26,18 +26,19 @@ jobs:
         run: |
           rsync -avz --delete --exclude='node_modules' --exclude='.git' ./ ec2-user@${{ secrets.EC2_HOST }}:/var/www/kraaiennest-api/
 
-      - name: Install dependencies on EC2
+      - name: Install dependencies and build TypeScript on EC2
         run: |
           ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_HOST }} "
           cd /var/www/kraaiennest-api &&
-          npm install
+          npm install &&
+          npm run build  # Compile TypeScript files to JavaScript
           "
 
-      - name: Restart application with PM2
+      - name: Restart application with PM2 (Run from dist)
         run: |
           ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_HOST }} "
           cd /var/www/kraaiennest-api &&
           pm2 stop all || true &&  # Stops all running PM2 processes if any
-          pm2 start npm --name kraaiennest-api -- run start &&  # Starts the app using npm run start
+          pm2 start dist/index.js --name kraaiennest-api &&  # Start the compiled JavaScript from dist folder
           pm2 save  # Saves the process list for PM2 to restart on reboot
           "
