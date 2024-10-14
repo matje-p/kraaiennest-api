@@ -13,11 +13,12 @@ const express_rate_limit_1 = __importDefault(require("express-rate-limit"));
 const boodschapRoutes_1 = __importDefault(require("./routes/boodschapRoutes"));
 const userRoutes_1 = __importDefault(require("./routes/userRoutes"));
 const householdRoutes_1 = __importDefault(require("./routes/householdRoutes"));
-// Load environment variables from .env file
-dotenv_1.default.config();
+// Load environment variables from the appropriate .env file based on the environment
+const envFile = process.env.NODE_ENV === 'production' ? '.env.production' : '.env.development';
+dotenv_1.default.config({ path: envFile });
+console.log(`Environment: ${process.env.NODE_ENV}`);
 // Create an Express application
 const app = (0, express_1.default)();
-console.log(`Environment: ${process.env.NODE_ENV}`);
 // CORS Middleware (move it up before any other middleware)
 const allowedOrigins = process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : [];
 const corsOptions = {
@@ -55,9 +56,7 @@ const pool = new pg_1.Pool({
     database: process.env.DB_NAME,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
-    ssl: {
-        rejectUnauthorized: false,
-    },
+    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false, // Disable SSL for local development
 });
 pool.connect()
     .then(() => console.log('PostgreSQL connected'))
