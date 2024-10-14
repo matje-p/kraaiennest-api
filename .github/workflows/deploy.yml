@@ -18,9 +18,12 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.EC2_SSH_KEY }} # Use your GitHub secret for the EC2 SSH key
 
+      - name: Create directory on EC2 with correct ownership
+        run: |
+          ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_HOST }} "sudo mkdir -p /var/www/kraaiennest-api && sudo chown -R ec2-user:ec2-user /var/www/kraaiennest-api"
+
       - name: Copy files to EC2
         run: |
-          ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_HOST }} "sudo mkdir -p /var/www/kraaiennest-api"
           scp -o StrictHostKeyChecking=no -r ./* ec2-user@${{ secrets.EC2_HOST }}:/var/www/kraaiennest-api/
 
       - name: Run deployment script on EC2
