@@ -39,6 +39,6 @@ jobs:
           ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_HOST }} "
           cd /var/www/kraaiennest-api &&
           pm2 stop all || true &&  # Stops all running PM2 processes if any
-          pm2 start dist/index.js --name kraaiennest-api &&  # Start the compiled JavaScript from dist folder
+          NODE_ENV=production pm2 start dist/index.js --name kraaiennest-api &&  # Start the compiled JavaScript from dist folder
           pm2 save  # Saves the process list for PM2 to restart on reboot
           "
