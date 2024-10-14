@@ -20,7 +20,7 @@ jobs:
 
       - name: Copy files to EC2
         run: |
-          ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_HOST }} "mkdir -p /var/www/kraaiennest-api"
+          ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_HOST }} "sudo mkdir -p /var/www/kraaiennest-api"
           scp -o StrictHostKeyChecking=no -r ./* ec2-user@${{ secrets.EC2_HOST }}:/var/www/kraaiennest-api/
 
       - name: Run deployment script on EC2
