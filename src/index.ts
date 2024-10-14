@@ -8,13 +8,14 @@ import boodschapRoutes from './routes/boodschapRoutes';
 import userRoutes from './routes/userRoutes';
 import householdRoutes from './routes/householdRoutes';
 
-// Load environment variables from .env file
-dotenv.config();
+// Load environment variables from the appropriate .env file based on the environment
+const envFile = process.env.NODE_ENV === 'production' ? '.env.production' : '.env.development';
+dotenv.config({ path: envFile });
+
+console.log(`Environment: ${process.env.NODE_ENV}`);
 
 // Create an Express application
 const app = express();
-
-console.log(`Environment: ${process.env.NODE_ENV}`);
 
 // CORS Middleware (move it up before any other middleware)
 const allowedOrigins = process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : [];
