@@ -40,8 +40,7 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_HOST }} "
           cd /var/www/kraaiennest-api &&
-          pm2 stop kraaiennest-api || true &&  # Stops only 'kraaiennest-api' if running
-          pm2 delete kraaiennest-api || true &&  # Deletes the process to avoid multiple instances
+          pm2 stop all || true &&  # Stops all running PM2 processes
+          pm2 delete all || true &&  # Deletes all PM2 processes to avoid multiple instances
           NODE_ENV=production pm2 start dist/index.js --name kraaiennest-api &&  # Start one instance with NODE_ENV=production
-          pm2 save  # Saves the process list for PM2 to restart on reboot
           "
