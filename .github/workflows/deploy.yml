@@ -30,17 +30,8 @@ jobs:
 
       - name: Install dependencies and build TypeScript on EC2
         run: |
-          ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_HOST }} "
-          cd /var/www/kraaiennest-api &&
-          npm install &&
-          npm run build  # Compile TypeScript files to JavaScript
-          "
+          ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_HOST }} "cd /var/www/kraaiennest-api && npm install && npm run build"
 
       - name: Ensure only one instance is running with PM2
         run: |
-          ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_HOST }} "
-          cd /var/www/kraaiennest-api &&
-          pm2 stop all || true &&  # Stops all running PM2 processes
-          pm2 delete all || true &&  # Deletes all PM2 processes to avoid multiple instances
-          NODE_ENV=production pm2 start dist/index.js --name kraaiennest-api &&  # Start one instance with NODE_ENV=production
-          "
+          ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_HOST }} "pm2 stop all || true && pm2 delete all || true && NODE_ENV=production pm2 start dist/index.js --name kraaiennest-api"
