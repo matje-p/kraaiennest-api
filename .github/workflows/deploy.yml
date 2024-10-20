@@ -35,14 +35,6 @@ jobs:
           npm run build  # Compile TypeScript files to JavaScript
           "
 
-      # New step: Run database migrations on the production database
-      - name: Run database migrations on production
-        run: |
-          ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_HOST }} "
-          cd /var/www/kraaiennest-api &&
-          npx knex migrate:latest --env production  # Run migrations for production environment
-          "
-
       - name: Ensure only one instance is running with PM2
         run: |
           ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_HOST }} "
