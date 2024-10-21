@@ -83,6 +83,7 @@ app.use((req, res) => {
     res.status(404).send('404 - Not Found');
 });
 const PORT = process.env.PORT || 5000;
+console.log(`PORT: ${PORT}`);
 app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
 // Type guard for error handling
 const isError = (err) => {

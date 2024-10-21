@@ -28,11 +28,15 @@ module.exports = {
         user: 'matjep',
         password: '%Mky9Uhw7P%2',  // Production password
         database: 'boodschappenlijstje_prod',
-        port: 5432
+        port: 5432,
+        ssl: {
+            rejectUnauthorized: false  // This disables certificate validation; useful for testing
+          }
       },
       migrations: {
         directory: './dist/migrations',  // Transpiled JavaScript in production
-        extension: 'js'  // JavaScript in production
+        extension: 'js',  // JavaScript in production
+        schemaName: 'public'  // Add this to ensure the public schema is used
       },
       seeds: {
         directory: './dist/seeds',
