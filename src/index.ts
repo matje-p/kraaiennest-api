@@ -1,12 +1,12 @@
-import express from 'express';
-import { Pool } from 'pg';
-import cors, { CorsOptions } from 'cors';
 import bodyParser from 'body-parser';
+import cors, { CorsOptions } from 'cors';
 import dotenv from 'dotenv';
+import express from 'express';
 import rateLimit from 'express-rate-limit';
+import { Pool } from 'pg';
+import { verifyToken } from './jwtMiddleware'; // Import the JWT middleware
 import boodschapRoutes from './routes/boodschapRoutes';
 import userRoutes from './routes/userRoutes';
-import householdRoutes from './routes/householdRoutes';
 
 // Load environment variables from the appropriate .env file based on the environment
 const envFile = process.env.NODE_ENV === 'production' ? '.env.production' : '.env.development';
@@ -71,6 +71,7 @@ declare global {
   namespace Express {
     interface Request {
       db: Pool;
+      user?: any; // Add user to the request object
     }
   }
 }
@@ -83,9 +84,10 @@ app.use((req, res, next) => {
 // Mount routes
 app.use('/boodschappen', boodschapRoutes);
 console.log('boodschapRoutes mounted');
-app.use('/households', householdRoutes);
-console.log('householdRoutes mounted');
-app.use('/users', userRoutes);
+
+// app.use('/households', verifyToken, householdRoutes); // JWT required for household routes
+// console.log('householdRoutes mounted');
+app.use('/users', verifyToken, userRoutes); // JWT required for user routes
 console.log('userRoutes mounted');
 
 // Root route

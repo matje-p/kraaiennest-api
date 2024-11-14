@@ -1,0 +1,76 @@
+Geheugen bijgewerkt
+To structure your API around the relationships between users, households, and boodschappen, you can follow RESTful principles, where the hierarchy and relationships are reflected in the API endpoints. Here's a guide for structuring GET, POST, PUT, and DELETE routes for each entity.
+
+1. Users
+Users are members of households, so you’ll need basic CRUD operations for managing users.
+
+API Endpoints:
+
+GET /users – Get all users.
+GET /users/:userId – Get a specific user by userId.
+POST /users – Create a new user (add them to a household during creation if needed).
+PUT /users/:userId – Update user details (e.g., name, email, household membership).
+DELETE /users/:userId – Delete a specific user.
+2. Households
+Households consist of users and have boodschappen. You need APIs to manage households and link users to them.
+
+API Endpoints:
+
+GET /households – Get all households.
+GET /households/:householdId – Get a specific household by householdId.
+POST /households – Create a new household (assign users to the household during creation).
+PUT /households/:householdId – Update household details (e.g., adding or removing users).
+DELETE /households/:householdId – Delete a specific household.
+Linking Users to Households:
+
+POST /households/:householdId/users/:userId – Add a user to a household.
+DELETE /households/:householdId/users/:userId – Remove a user from a household.
+3. Boodschappen (Grocery List Items)
+Each household has boodschappen, and the APIs should manage them in relation to households.
+
+API Endpoints:
+
+GET /households/:householdId/boodschappen – Get all boodschappen for a specific household.
+GET /households/:householdId/boodschappen/:boodschapId – Get a specific boodschap by boodschapId.
+POST /households/:householdId/boodschappen – Add a new boodschap to a household.
+PUT /households/:householdId/boodschappen/:boodschapId – Update an existing boodschap in the household.
+DELETE /households/:householdId/boodschappen/:boodschapId – Remove a specific boodschap from the household.
+Example of API Structure
+Users API:
+GET /users – Fetch all users.
+GET /users/:userId – Fetch a specific user.
+POST /users – Create a new user.
+PUT /users/:userId – Update user details.
+DELETE /users/:userId – Delete a user.
+Households API:
+GET /households – Fetch all households.
+GET /households/:householdId – Fetch a specific household.
+POST /households – Create a new household.
+PUT /households/:householdId – Update household details.
+DELETE /households/:householdId – Delete a household.
+Managing Users in Households:
+POST /households/:householdId/users/:userId – Add a user to a household.
+DELETE /households/:householdId/users/:userId – Remove a user from a household.
+Boodschappen API:
+GET /households/:householdId/boodschappen – Fetch all boodschappen for a household.
+GET /households/:householdId/boodschappen/:boodschapId – Fetch a specific boodschap.
+POST /households/:householdId/boodschappen – Add a new boodschap to a household.
+PUT /households/:householdId/boodschappen/:boodschapId – Update a boodschap.
+DELETE /households/:householdId/boodschappen/:boodschapId – Delete a boodschap.
+RESTful Hierarchical Structure
+Users: /users/:userId
+Households: /households/:householdId
+Boodschappen: /households/:householdId/boodschappen
+This structure follows RESTful principles, making the relationships between users, households, and boodschappen clear and easy to understand.
+
+Additional Considerations:
+Authentication: Implement user authentication to ensure that users can only manage their own households and boodschappen.
+Pagination & Filtering: For GET /users or GET /households, you may want to implement pagination and filters to handle large data sets.
+Error Handling: Ensure you handle errors like missing resources (404), unauthorized access (401), and validation errors (400).
+This structure is scalable, intuitive, and RESTful. Let me know if you need further refinement!
+
+
+
+
+
+
