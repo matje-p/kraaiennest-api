@@ -19,6 +19,10 @@ export const verifyToken = (req: Request, res: Response, next: NextFunction) => 
   console.log('Processing token for:', req.originalUrl);
   console.log('Authorization header present:', !!req.headers.authorization);
 
+  const token = req.headers.authorization;
+  console.log('Token:', token);
+  
+
   authMiddleware(req, res, (error?: any) => {
     if (error) {
       console.error('Token verification failed:', error);
