@@ -7,6 +7,9 @@ dotenv.config({ path: envFile });
 
 const auth0Domain = process.env.AUTH0_DOMAIN
 const auth0Audience = process.env.AUTH0_AUDIENCE
+console.log('Auth0 Configuration:');
+console.log('Domain:', auth0Domain);
+console.log('Audience:', auth0Audience);
 
 // Create auth middleware
 const authMiddleware = auth({
