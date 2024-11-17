@@ -17,6 +17,7 @@ console.log(`Environment: ${process.env.NODE_ENV}`);
 // Create an Express application
 const app = express();
 
+
 // CORS Middleware (move it up before any other middleware)
 const allowedOrigins = process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : [];
 
