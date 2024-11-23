@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { isError } from '../index';
 import { convertKeysSnakeToCamel } from '../utils/caseConversions';
+import isValidUUID from '../utils/isValidUuid';
 const router = Router();
 
 // Fetch households for a user
@@ -9,8 +10,12 @@ router.get('/', (req, res) => {
   res.send('User API Running');
 });
 
+
+
 // Fetch all data for the authenticated user
 router.get('/me', async (req, res) => {
+  console.log('User me route hit');
+
   const sub = req.user?.sub;
   console.log("Request for user data with userId (sub): ", sub);
 
@@ -92,6 +97,71 @@ router.get('/me', async (req, res) => {
       res.status(500).json({ error: err.message });
     } else {
       res.status(500).json({ error: 'Unknown error' });
+    }
+  }
+});
+
+router.get('/:userUuid', async (req, res) => {
+  console.log('userUuid request hit');
+  const userUuid = req.params.userUuid;
+  console.log('Request for user with userUuid:', userUuid);
+
+  if (!isValidUUID(userUuid)) {
+    return res.status(400).json({ error: 'Invalid UUID format' });
+  }
+
+  try {
+    // Only select specific columns that are needed/safe to share
+    const result = await req.db.query(
+      `WITH user_data AS (
+        SELECT * FROM user_schema.users 
+        WHERE user_uuid = $1
+        )
+        SELECT 
+            user_data.user_uuid,
+            user_data.email_address,
+            user_data.first_name,
+            user_data.last_name,
+            user_data.households,
+            user_data.default_household,
+            COALESCE(
+                json_agg(
+                json_build_object(
+                    'household_uuid', h.household_uuid,
+                    'name', h.household_full_name
+                )
+                ) FILTER (WHERE h.household_uuid IS NOT NULL),
+                '[]'::json
+            ) as household_data
+        FROM user_data
+        LEFT JOIN household_schema.households h 
+        ON h.household_uuid::text = ANY(user_data.households)
+        GROUP BY 
+            user_data.user_uuid,
+            user_data.email_address,
+            user_data.first_name,
+            user_data.last_name,
+            user_data.households,
+            user_data.default_household`,
+      [userUuid]
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const user = convertKeysSnakeToCamel(result.rows[0]);
+    
+    // Consider what user data should be public vs private
+    // Maybe check if requesting user has permission to see all data
+    
+    res.json(user);
+  } catch (err) {
+    console.error('Error fetching user:', err);
+    if (isError(err)) {
+      // Don't send internal error messages to client
+      res.status(500).json({ error: 'Failed to fetch user data' });
+    } else {
+      res.status(500).json({ error: 'Internal server error' });
     }
   }
 });
