@@ -10,9 +10,6 @@ router.get('/', (req, res) => {
   res.send('User API Running');
 });
 
-
-
-// Fetch all data for the authenticated user
 router.get('/me', async (req, res) => {
   console.log('User me route hit');
 
@@ -101,6 +98,7 @@ router.get('/me', async (req, res) => {
   }
 });
 
+// Fetch all data for the authenticated user
 router.get('/:userUuid', async (req, res) => {
   console.log('userUuid request hit');
   const userUuid = req.params.userUuid;
@@ -150,16 +148,49 @@ router.get('/:userUuid', async (req, res) => {
     }
 
     const user = convertKeysSnakeToCamel(result.rows[0]);
-    
-    // Consider what user data should be public vs private
-    // Maybe check if requesting user has permission to see all data
-    
     res.json(user);
   } catch (err) {
     console.error('Error fetching user:', err);
     if (isError(err)) {
-      // Don't send internal error messages to client
       res.status(500).json({ error: 'Failed to fetch user data' });
+    } else {
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  }
+});
+
+// PATCH route for updating default household
+router.patch('/me/default-household', async (req, res) => {
+  const sub = req.user?.sub;
+  const { householdUuid } = req.body;
+
+  if (!sub) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  if (!householdUuid || !isValidUUID(householdUuid)) {
+    return res.status(400).json({ error: 'Invalid household UUID' });
+  }
+
+  try {
+    const result = await req.db.query(
+      `UPDATE user_schema.users 
+       SET default_household = $1 
+       WHERE sub = $2 
+       RETURNING user_uuid, default_household`,
+      [householdUuid, sub]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const updatedUser = convertKeysSnakeToCamel(result.rows[0]);
+    res.json(updatedUser);
+  } catch (err) {
+    console.error('Error updating default household:', err);
+    if (isError(err)) {
+      res.status(500).json({ error: 'Failed to update default household' });
     } else {
       res.status(500).json({ error: 'Internal server error' });
     }
