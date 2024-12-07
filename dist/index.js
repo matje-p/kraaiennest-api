@@ -4,20 +4,25 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.isError = void 0;
+const dotenv_1 = __importDefault(require("dotenv"));
+// Load environment variables first
+const envFile = process.env.NODE_ENV === 'production' ? '.env.production' : '.env.development';
+dotenv_1.default.config({ path: envFile });
+// Add debug logging
+console.log(`Environment: ${process.env.NODE_ENV}`);
+console.log('Current NODE_ENV:', process.env.NODE_ENV);
+console.log('Loading env from:', envFile);
+console.log('Raw ALLOWED_ORIGINS:', process.env.ALLOWED_ORIGINS);
+// Then do the rest of your imports
 const body_parser_1 = __importDefault(require("body-parser"));
 const cors_1 = __importDefault(require("cors"));
-const dotenv_1 = __importDefault(require("dotenv"));
 const express_1 = __importDefault(require("express"));
 const express_rate_limit_1 = __importDefault(require("express-rate-limit"));
 const pg_1 = require("pg");
-const jwtMiddleware_1 = require("./jwtMiddleware"); // Import the JWT middleware
+const jwtMiddleware_1 = require("./jwtMiddleware");
 const boodschapRoutes_1 = __importDefault(require("./routes/boodschapRoutes"));
 const userRoutes_1 = __importDefault(require("./routes/userRoutes"));
 const householdRoutes_1 = __importDefault(require("./routes/householdRoutes"));
-// Load environment variables from the appropriate .env file based on the environment
-const envFile = process.env.NODE_ENV === 'production' ? '.env.production' : '.env.development';
-dotenv_1.default.config({ path: envFile });
-console.log(`Environment: ${process.env.NODE_ENV}`);
 // Create an Express application
 const app = (0, express_1.default)();
 // CORS Middleware (move it up before any other middleware)
