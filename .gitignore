@@ -1,2 +1,3 @@
 .vercel
 routes/routesoverview.txt
+.env.development
