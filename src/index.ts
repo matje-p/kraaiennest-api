@@ -1,19 +1,25 @@
-import bodyParser from 'body-parser';
-import cors, { CorsOptions } from 'cors';
 import dotenv from 'dotenv';
-import express from 'express';
-import rateLimit from 'express-rate-limit';
-import { Pool } from 'pg';
-import { verifyToken } from './jwtMiddleware'; // Import the JWT middleware
-import boodschapRoutes from './routes/boodschapRoutes';
-import userRoutes from './routes/userRoutes';
-import householdRoutes from './routes/householdRoutes';
 
-// Load environment variables from the appropriate .env file based on the environment
+// Load environment variables first
 const envFile = process.env.NODE_ENV === 'production' ? '.env.production' : '.env.development';
 dotenv.config({ path: envFile });
 
+// Add debug logging
 console.log(`Environment: ${process.env.NODE_ENV}`);
+console.log('Current NODE_ENV:', process.env.NODE_ENV);
+console.log('Loading env from:', envFile);
+console.log('Raw ALLOWED_ORIGINS:', process.env.ALLOWED_ORIGINS);
+
+// Then do the rest of your imports
+import bodyParser from 'body-parser';
+import cors, { CorsOptions } from 'cors';
+import express from 'express';
+import rateLimit from 'express-rate-limit';
+import { Pool } from 'pg';
+import { verifyToken } from './jwtMiddleware';
+import boodschapRoutes from './routes/boodschapRoutes';
+import userRoutes from './routes/userRoutes';
+import householdRoutes from './routes/householdRoutes';
 
 // Create an Express application
 const app = express();
