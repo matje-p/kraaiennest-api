@@ -1,14 +1,16 @@
 import dotenv from 'dotenv';
 
-// Load environment variables first
-const envFile = process.env.NODE_ENV === 'production' ? '.env.production' : '.env.development';
-dotenv.config({ path: envFile });
+console.log('Starting app...');
+console.log('Initial NODE_ENV:', process.env.NODE_ENV);
 
-// Add debug logging
-console.log(`Environment: ${process.env.NODE_ENV}`);
-console.log('Current NODE_ENV:', process.env.NODE_ENV);
-console.log('Loading env from:', envFile);
-console.log('Raw ALLOWED_ORIGINS:', process.env.ALLOWED_ORIGINS);
+const envFile = process.env.NODE_ENV === 'production' ? '.env.production' : '.env.development';
+console.log('Loading config from:', envFile);
+const result = dotenv.config({ path: envFile });
+console.log('dotenv result:', result);
+
+console.log('After loading env:');
+console.log('NODE_ENV:', process.env.NODE_ENV);
+console.log('ALLOWED_ORIGINS:', process.env.ALLOWED_ORIGINS);
 
 // Then do the rest of your imports
 import bodyParser from 'body-parser';
