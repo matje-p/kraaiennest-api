@@ -21,6 +21,7 @@ const app = express();
 
 // CORS Middleware (move it up before any other middleware)
 const allowedOrigins = process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : [];
+console.log('Parsed allowed origins:', allowedOrigins);
 
 const corsOptions: CorsOptions = {
   origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
