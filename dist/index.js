@@ -13,6 +13,7 @@ const pg_1 = require("pg");
 const jwtMiddleware_1 = require("./jwtMiddleware"); // Import the JWT middleware
 const boodschapRoutes_1 = __importDefault(require("./routes/boodschapRoutes"));
 const userRoutes_1 = __importDefault(require("./routes/userRoutes"));
+const householdRoutes_1 = __importDefault(require("./routes/householdRoutes"));
 // Load environment variables from the appropriate .env file based on the environment
 const envFile = process.env.NODE_ENV === 'production' ? '.env.production' : '.env.development';
 dotenv_1.default.config({ path: envFile });
@@ -21,6 +22,7 @@ console.log(`Environment: ${process.env.NODE_ENV}`);
 const app = (0, express_1.default)();
 // CORS Middleware (move it up before any other middleware)
 const allowedOrigins = process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : [];
+console.log('Parsed allowed origins:', allowedOrigins);
 const corsOptions = {
     origin: (origin, callback) => {
         if (allowedOrigins.includes(origin || '') || !origin) {
@@ -66,10 +68,10 @@ app.use((req, res, next) => {
     next();
 });
 // Mount routes
-app.use('/boodschappen', boodschapRoutes_1.default);
+app.use('/boodschappen', jwtMiddleware_1.verifyToken, boodschapRoutes_1.default);
 console.log('boodschapRoutes mounted');
-// app.use('/households', verifyToken, householdRoutes); // JWT required for household routes
-// console.log('householdRoutes mounted');
+app.use('/households', jwtMiddleware_1.verifyToken, householdRoutes_1.default); // JWT required for household routes
+console.log('householdRoutes mounted');
 app.use('/users', jwtMiddleware_1.verifyToken, userRoutes_1.default); // JWT required for user routes
 console.log('userRoutes mounted');
 // Root route

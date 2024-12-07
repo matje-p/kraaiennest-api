@@ -8,8 +8,15 @@ const express_oauth2_jwt_bearer_1 = require("express-oauth2-jwt-bearer");
 const dotenv_1 = __importDefault(require("dotenv"));
 const envFile = process.env.NODE_ENV === 'production' ? '.env.production' : '.env.development';
 dotenv_1.default.config({ path: envFile });
+// Add some debugging to help troubleshoot
+console.log('Current NODE_ENV:', process.env.NODE_ENV);
+console.log('Loading env from:', envFile);
+console.log('Process working directory:', process.cwd());
 const auth0Domain = process.env.AUTH0_DOMAIN;
 const auth0Audience = process.env.AUTH0_AUDIENCE;
+console.log('Auth0 Configuration:');
+console.log('Domain:', auth0Domain);
+console.log('Audience:', auth0Audience);
 // Create auth middleware
 const authMiddleware = (0, express_oauth2_jwt_bearer_1.auth)({
     audience: auth0Audience,
@@ -19,6 +26,8 @@ const authMiddleware = (0, express_oauth2_jwt_bearer_1.auth)({
 const verifyToken = (req, res, next) => {
     console.log('Processing token for:', req.originalUrl);
     console.log('Authorization header present:', !!req.headers.authorization);
+    const token = req.headers.authorization;
+    console.log('Token:', token);
     authMiddleware(req, res, (error) => {
         var _a, _b, _c;
         if (error) {

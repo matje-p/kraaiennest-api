@@ -17,33 +17,17 @@ router.get('/', (req, res) => {
     console.log('Boodschappen root route hit');
     res.send('Boodschappen API Running');
 });
-// // Fetch all not-removed boodschappen per houeshold
-// router.get('/:householdName', async (req, res) => {
-//   try {
-//     console.log(`Fetching boodschappen for household: ${req.params.householdName}`);
-//     const { householdName } = req.params;
-//     const result = await req.db.query(
-//       'SELECT * FROM boodschap_schema.boodschaps WHERE household_name = $1 AND removed = FALSE',
-//       [householdName]
-//     );
-//     res.json(convertKeysSnakeToCamel(result.rows));
-//   } catch (err) {
-//     console.error('Error fetching boodschappen:', err);
-//     if (isError(err)) {
-//       res.status(500).json({ error: err.message });
-//     } else {
-//       res.status(500).json({ error: 'Unknown error' });   
-//     }
-//   }
-// });
 router.post('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     console.log('Adding new boodschap:', req.body);
     try {
-        const { householdUuid, item = "", userAddedUuid, dateAdded = new Date().toISOString() } = req.body;
+        const { householdUuid, item = "", userAddedUuid, // Changed from userAddedUuidFirstname
+        userAddedFirstname, // Added this
+        dateAdded = new Date().toISOString() } = req.body;
         const result = yield req.db.query(`INSERT INTO boodschap_schema.boodschaps 
-      (household_uuid, item, user_added_uuid, date_added, removed, boodschap_uuid) 
-      VALUES ($1, $2, $3, $4, FALSE, gen_random_uuid()) 
-      RETURNING *`, [householdUuid, item, userAddedUuid, dateAdded]);
+      (household_uuid, item, user_added_uuid, user_added_firstname, date_added, removed, done, changed, boodschap_uuid) 
+      VALUES ($1, $2, $3, $4, $5, FALSE, FALSE, FALSE, gen_random_uuid()) 
+      RETURNING *`, [householdUuid, item, userAddedUuid, userAddedFirstname, dateAdded] // Added userAddedFirstname
+        );
         res.json((0, caseConversions_1.convertKeysSnakeToCamel)(result.rows[0]));
     }
     catch (err) {
