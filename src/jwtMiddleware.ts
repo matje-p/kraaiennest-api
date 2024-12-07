@@ -5,8 +5,13 @@ import dotenv from 'dotenv';
 const envFile = process.env.NODE_ENV === 'production' ? '.env.production' : '.env.development';
 dotenv.config({ path: envFile });
 
-const auth0Domain = process.env.AUTH0_DOMAIN
-const auth0Audience = process.env.AUTH0_AUDIENCE
+// Add some debugging to help troubleshoot
+console.log('Current NODE_ENV:', process.env.NODE_ENV);
+console.log('Loading env from:', envFile);
+console.log('Process working directory:', process.cwd());
+
+const auth0Domain = process.env.AUTH0_DOMAIN;
+const auth0Audience = process.env.AUTH0_AUDIENCE;
 console.log('Auth0 Configuration:');
 console.log('Domain:', auth0Domain);
 console.log('Audience:', auth0Audience);
