@@ -3,16 +3,18 @@ import dotenv from 'dotenv';
 console.log('Starting app...');
 console.log('Initial NODE_ENV:', process.env.NODE_ENV);
 
-const envFile = process.env.NODE_ENV === 'production' ? '.env.production' : '.env.development';
-console.log('Loading config from:', envFile);
-const result = dotenv.config({ path: envFile });
-console.log('dotenv result:', result);
+// Only load .env file in development
+if (process.env.NODE_ENV !== 'production') {
+    const envFile = '.env.development';
+    console.log('Loading config from:', envFile);
+    const result = dotenv.config({ path: envFile });
+    console.log('dotenv result:', result);
+}
 
 console.log('After loading env:');
 console.log('NODE_ENV:', process.env.NODE_ENV);
 console.log('ALLOWED_ORIGINS:', process.env.ALLOWED_ORIGINS);
 
-// Then do the rest of your imports
 import bodyParser from 'body-parser';
 import cors, { CorsOptions } from 'cors';
 import express from 'express';
