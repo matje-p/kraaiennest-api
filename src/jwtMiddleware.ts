@@ -2,12 +2,14 @@ import { Request, Response, NextFunction } from 'express';
 import { auth } from 'express-oauth2-jwt-bearer';
 import dotenv from 'dotenv';
 
-const envFile = process.env.NODE_ENV === 'production' ? '.env.production' : '.env.development';
-dotenv.config({ path: envFile });
+// Only load .env file in development
+if (process.env.NODE_ENV !== 'production') {
+    dotenv.config({ path: '.env.development' });
+}
 
 // Add some debugging to help troubleshoot
 console.log('Current NODE_ENV:', process.env.NODE_ENV);
-console.log('Loading env from:', envFile);
+console.log('AUTH0_DOMAIN:', process.env.AUTH0_DOMAIN);
 console.log('Process working directory:', process.cwd());
 
 const auth0Domain = process.env.AUTH0_DOMAIN;
